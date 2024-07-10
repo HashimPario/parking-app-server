@@ -3,7 +3,7 @@ const userCtrl = require('../controllers/userCtrl')
 
 
 router.post("/register",userCtrl.register)
-// router.post("/login",userCtrl.login)
+router.post("/login",userCtrl.login)
 // router.post("/addArea",userCtrl.addArea)
 // router.post("/addPlace/:id",userCtrl.addPlace)
 
