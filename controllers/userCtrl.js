@@ -67,7 +67,7 @@ const userCtrl = {
         try {
             const { areaId, totalSlots, placeData, slotsData } = req.body;
     
-            // Validate that placeData and slotsData are arrays
+           
             if (!Array.isArray(placeData) || !Array.isArray(slotsData)) {
                 throw new Error('Invalid data format');
             }
@@ -75,21 +75,21 @@ const userCtrl = {
             const area = await Places.findOne({ areaId });
     
             if (area) {
-                // Add new places to the existing placeData
+           
                 area.placeData.push(...placeData);
                 area.totalSlots = parseInt(area.totalSlots) + parseInt(totalSlots);
     
-                // Update the area document
+             
                 await Areas.findByIdAndUpdate(areaId, {
                     areaQty: area.placeData.length,
                     slotQty: area.totalSlots
                 });
     
-                // Save the changes to the place document
+              
                 await area.save();
                 return res.json({ message: 'Place added successfully', area });
             } else {
-                // Create a new area if it doesn't exist
+               
                 await Areas.findByIdAndUpdate(areaId, {
                     areaQty: 1,
                     slotQty: totalSlots
@@ -106,7 +106,7 @@ const userCtrl = {
                 return res.json({ message: 'Place created and added successfully', addPlace });
             }
         } catch (err) {
-            console.error(err);  // Log the full error object
+           // console.error(err); 
             return res.status(500).json({ message: err.message });
         }
     },
@@ -155,7 +155,7 @@ const userCtrl = {
     
             return res.json({ message: 'Booking saved successfully!' });
         } catch (error) {
-            console.error('Error in userBooking:', error);
+           // console.error('Error in userBooking:', error);
             return res.status(500).json({ message: 'Internal server error', error: error.message });
         }
         // try {
@@ -179,7 +179,7 @@ const userCtrl = {
         // } catch (error) {
         //     console.error('Error in userBooking:', error);
         //     return res.status(500).json({ message: 'Internal server error', error: error.message });
-        // }
+        // }h76g tg76nhgyu7hujmi9
     },
     
     
@@ -196,7 +196,7 @@ const userCtrl = {
             return res.json({ msg: addBooking })
 
         } catch (error) {
-            console.error('Error saving user booking:', error);
+           // console.error('Error saving user booking:', error);
             return res.status(500).json({ msg: 'Internal server error', error: error.message });
         }
 
@@ -207,7 +207,7 @@ const userCtrl = {
             const allAreas = await Areas.find();
             res.json(allAreas);
         } catch (error) {
-            console.error(error);
+         //   console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
@@ -216,7 +216,7 @@ const userCtrl = {
             const allPlaces = await Places.find();
             res.json(allPlaces);
         } catch (error) {
-            console.error(error);
+         //   console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
@@ -226,7 +226,7 @@ const userCtrl = {
             const allUsers = await Users.find();
             res.json(allUsers);
         } catch (error) {
-            console.error(error);
+           // console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
@@ -240,7 +240,7 @@ const userCtrl = {
             }
             return res.json(currentUser.booking); 
         } catch (error) {
-            console.error(error);
+         //   console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
@@ -251,7 +251,7 @@ const userCtrl = {
             const currentUser = await Users.findById(token);
             return res.json(currentUser);
         } catch (error) {
-            console.error(error);
+          //  console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
@@ -284,6 +284,19 @@ const userCtrl = {
                 name, password: passwordHash
             })
             return res.json({ message: "Password Updated" })
+
+        } catch (error) {
+            return res.status(500).json({ message: err.message });
+        }
+    },
+
+    deletePlace: async (req, res) => {
+        try {
+            const { id } = req.params
+            // const place = await Places.findById(id);
+         
+            await Places.findByIdAndDelete(id)
+            return res.json({ message: "Place Deleted" })
 
         } catch (error) {
             return res.status(500).json({ message: err.message });
