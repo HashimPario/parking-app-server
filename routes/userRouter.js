@@ -24,6 +24,6 @@ router.post("/blockUser/:val",userCtrl.blockUser)
 
 router.post("/updateprofile/:userId",userCtrl.updateProfile)
 
-router.delete("/deletaPlace/id", userCtrl.deletePlace)
+router.post("/deletaPlace", userCtrl.deletePlace)
 
 module.exports = router

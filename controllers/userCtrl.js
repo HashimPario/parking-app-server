@@ -291,15 +291,32 @@ const userCtrl = {
     },
 
     deletePlace: async (req, res) => {
+        // try {
+        //     const {id, areaProp} = req.body;
+        //     let areaId = areaProp;
+        //     const area = await Places.findOne(areaId);
+        //     // const del = await Places.placeData(findByIdAndDelete(req.params._id))
+        //     return res.json({message: area})
+    
+        // } catch (error) {
+        //     return res.status(500).json({message: error.message})
+        // }
+        const { customId, id } = req.body;
+        let areaId = customId;
         try {
-            const { id } = req.params
-            // const place = await Places.findById(id);
-         
-            await Places.findByIdAndDelete(id)
-            return res.json({ message: "Place Deleted" })
-
+            const updatedPlace = await Places.findByIdAndUpdate(
+                areaId,
+                { $pull: { placeData: { _id: id } } },
+                { new: true }
+            );
+    
+            if (!updatedPlace) {
+                return res.status(404).json({ message: 'Place or placeData not found' });
+            }
+    
+            return res.json({message: "Deleted"});
         } catch (error) {
-            return res.status(500).json({ message: err.message });
+            res.status(500).json({ message: 'Server error', error });
         }
     }
 }
