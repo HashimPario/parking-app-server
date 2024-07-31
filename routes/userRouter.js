@@ -24,6 +24,8 @@ router.post("/blockUser/:val",userCtrl.blockUser)
 
 router.post("/updateprofile/:userId",userCtrl.updateProfile)
 
-router.post("/deletaPlace", userCtrl.deletePlace)
+
+router.delete('/delete-place/:areaId/:placeId', userCtrl.deletePlace);
+router.put('/update-place/:areaId/:placeId', userCtrl.updatePlace);
 
 module.exports = router

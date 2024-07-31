@@ -62,51 +62,51 @@ const userCtrl = {
         }
     },
 
-    
+
     addPlace: async (req, res) => {
         try {
             const { areaId, totalSlots, placeData, slotsData } = req.body;
-    
-           
+
+
             if (!Array.isArray(placeData) || !Array.isArray(slotsData)) {
                 throw new Error('Invalid data format');
             }
-    
+
             const area = await Places.findOne({ areaId });
-    
+
             if (area) {
-           
+
                 area.placeData.push(...placeData);
                 area.totalSlots = parseInt(area.totalSlots) + parseInt(totalSlots);
-    
-             
+
+
                 await Areas.findByIdAndUpdate(areaId, {
                     areaQty: area.placeData.length,
                     slotQty: area.totalSlots
                 });
-    
-              
+
+
                 await area.save();
                 return res.json({ message: 'Place added successfully', area });
             } else {
-               
+
                 await Areas.findByIdAndUpdate(areaId, {
                     areaQty: 1,
                     slotQty: totalSlots
                 });
-    
+
                 const addPlace = new Places({
                     areaId,
                     totalSlots,
                     placeData,
                     slotsData
                 });
-    
+
                 await addPlace.save();
                 return res.json({ message: 'Place created and added successfully', addPlace });
             }
         } catch (err) {
-           // console.error(err); 
+            // console.error(err); 
             return res.status(500).json({ message: err.message });
         }
     },
@@ -117,20 +117,20 @@ const userCtrl = {
             if (!userId || !Array.isArray(bookingData)) {
                 return res.status(400).json({ message: 'Invalid request data' });
             }
-    
+
             const user = await Users.findById(userId);
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
-    
-          
+
+
             user.booking.push(...bookingData);
             await user.save();
-    
-       
+
+
             for (const booking of bookingData) {
                 const { placeName, slotNumber, bookingDate, bookingFrom, bookingTo } = booking;
-    
+
                 await Places.updateOne(
                     {
                         'placeData.placeName': placeName,
@@ -152,10 +152,10 @@ const userCtrl = {
                     }
                 );
             }
-    
+
             return res.json({ message: 'Booking saved successfully!' });
         } catch (error) {
-           // console.error('Error in userBooking:', error);
+            // console.error('Error in userBooking:', error);
             return res.status(500).json({ message: 'Internal server error', error: error.message });
         }
         // try {
@@ -163,16 +163,16 @@ const userCtrl = {
         //     if (!userId || !Array.isArray(bookingData)) {
         //         return res.status(400).json({ message: 'Invalid request data' });
         //     }
-    
+
         //     let _id = userId;
-    
+
         //     const user = await Users.findOne({ _id });
         //     if (user) {
         //         user.booking.push(...bookingData);
-                
+
         //         await user.save();
         //         return res.json({ message: 'Booking saved successfully!' });
-    
+
         //     } else {
         //         return res.status(404).json({ message: 'User not found' });
         //     }
@@ -181,8 +181,8 @@ const userCtrl = {
         //     return res.status(500).json({ message: 'Internal server error', error: error.message });
         // }h76g tg76nhgyu7hujmi9
     },
-    
-    
+
+
     addBooking: async (req, res) => {
         try {
             const { userId, bookingData } = req.body;
@@ -196,7 +196,7 @@ const userCtrl = {
             return res.json({ msg: addBooking })
 
         } catch (error) {
-           // console.error('Error saving user booking:', error);
+            // console.error('Error saving user booking:', error);
             return res.status(500).json({ msg: 'Internal server error', error: error.message });
         }
 
@@ -207,7 +207,7 @@ const userCtrl = {
             const allAreas = await Areas.find();
             res.json(allAreas);
         } catch (error) {
-         //   console.error(error);
+            //   console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
@@ -216,7 +216,7 @@ const userCtrl = {
             const allPlaces = await Places.find();
             res.json(allPlaces);
         } catch (error) {
-         //   console.error(error);
+            //   console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
@@ -226,7 +226,7 @@ const userCtrl = {
             const allUsers = await Users.find();
             res.json(allUsers);
         } catch (error) {
-           // console.error(error);
+            // console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
@@ -238,9 +238,9 @@ const userCtrl = {
             if (!currentUser) {
                 return res.status(404).json({ error: 'User not found' });
             }
-            return res.json(currentUser.booking); 
+            return res.json(currentUser.booking);
         } catch (error) {
-         //   console.error(error);
+            //   console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
@@ -251,7 +251,7 @@ const userCtrl = {
             const currentUser = await Users.findById(token);
             return res.json(currentUser);
         } catch (error) {
-          //  console.error(error);
+            //  console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     },
@@ -289,33 +289,52 @@ const userCtrl = {
             return res.status(500).json({ message: err.message });
         }
     },
-
-    deletePlace: async (req, res) => {
-        // try {
-        //     const {id, areaProp} = req.body;
-        //     let areaId = areaProp;
-        //     const area = await Places.findOne(areaId);
-        //     // const del = await Places.placeData(findByIdAndDelete(req.params._id))
-        //     return res.json({message: area})
     
-        // } catch (error) {
-        //     return res.status(500).json({message: error.message})
-        // }
-        const { customId, id } = req.body;
-        let areaId = customId;
+    deletePlace: async (req, res) => {
+        const { areaId, placeId } = req.params;
+    
         try {
-            const updatedPlace = await Places.findByIdAndUpdate(
-                areaId,
-                { $pull: { placeData: { _id: id } } },
+            const place = await Places.findOneAndUpdate(
+                { areaId },
+                {
+                    $pull: { placeData: { _id: placeId } }
+                },
                 { new: true }
             );
     
-            if (!updatedPlace) {
-                return res.status(404).json({ message: 'Place or placeData not found' });
+            if (!place) {
+                return res.status(404).json({ message: 'Place not found' });
             }
     
-            return res.json({message: "Deleted"});
+            res.status(200).json(place);
         } catch (error) {
+            res.status(500).json({ message: 'Server error', error });
+        }
+    },
+    
+    updatePlace: async (req, res) => {
+        const { areaId, placeId } = req.params;
+        const { placeName, slotsQuantity } = req.body;
+    
+        try {
+            const place = await Places.findOneAndUpdate(
+                { areaId, 'placeData._id': placeId },
+                {
+                    $set: {
+                        'placeData.$.placeName': placeName,
+                        'placeData.$.slotsQuantity': slotsQuantity
+                    }
+                },
+                { new: true }
+            );
+    
+            if (!place) {
+                return res.status(404).json({ message: 'Place not found' });
+            }
+    
+            res.status(200).json(place);
+        } catch (error) {
+            console.error('Server error:', error); // Log the error
             res.status(500).json({ message: 'Server error', error });
         }
     }
