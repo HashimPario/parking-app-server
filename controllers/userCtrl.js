@@ -289,10 +289,10 @@ const userCtrl = {
             return res.status(500).json({ message: err.message });
         }
     },
-    
+
     deletePlace: async (req, res) => {
         const { areaId, placeId } = req.params;
-    
+
         try {
             const place = await Places.findOneAndUpdate(
                 { areaId },
@@ -301,65 +301,65 @@ const userCtrl = {
                 },
                 { new: true }
             );
-    
+
             if (!place) {
                 return res.status(404).json({ message: 'Place not found' });
             }
-    
+
             res.status(200).json({ message: 'Place Deleted' });
-         
+
         } catch (error) {
             res.status(500).json({ message: 'Server error', error });
         }
-    },  
-    
+    },
+
     updatePlace: async (req, res) => {
         const { areaId, placeId } = req.params;
-    const { placeName, slotsQuantity } = req.body;
+        const { placeName, slotsQuantity } = req.body;
 
-    try {
-      
-        const place = await Places.findOneAndUpdate(
-            { areaId, 'placeData._id': placeId },
-            {
-                $set: {
-                    'placeData.$.placeName': placeName,
-                    'placeData.$.slotsQuantity': slotsQuantity
-                }
-            },
-            { new: true }
-        );
+        try {
 
-        if (!place) {
-            return res.status(404).json({ message: 'Place not found' });
-        }
+            const place = await Places.findOneAndUpdate(
+                { areaId, 'placeData._id': placeId },
+                {
+                    $set: {
+                        'placeData.$.placeName': placeName,
+                        'placeData.$.slotsQuantity': slotsQuantity
+                    }
+                },
+                { new: true }
+            );
 
-      
-        const placeIndex = place.placeData.findIndex(p => p._id.toString() === placeId);
-        if (placeIndex !== -1) {
-            const currentSlotsData = place.placeData[placeIndex].slotsData;
-            const newSlotsData = [];
-
-            for (let i = 0; i < slotsQuantity; i++) {
-                if (i < currentSlotsData.length) {
-                 
-                    newSlotsData.push(currentSlotsData[i]);
-                } else {
-                
-                    newSlotsData.push({ slotNumber: i + 1 });
-                }
+            if (!place) {
+                return res.status(404).json({ message: 'Place not found' });
             }
 
-            
-            place.placeData[placeIndex].slotsData = newSlotsData;
-            await place.save();
-        }
 
-        res.status(200).json({ message: 'Updated Successfully' });
-    } catch (error) {
-        console.error('Server error:', error); 
-        res.status(500).json({ message: 'Server error', error });
-    }
+            const placeIndex = place.placeData.findIndex(p => p._id.toString() === placeId);
+            if (placeIndex !== -1) {
+                const currentSlotsData = place.placeData[placeIndex].slotsData;
+                const newSlotsData = [];
+
+                for (let i = 0; i < slotsQuantity; i++) {
+                    if (i < currentSlotsData.length) {
+
+                        newSlotsData.push(currentSlotsData[i]);
+                    } else {
+
+                        newSlotsData.push({ slotNumber: i + 1 });
+                    }
+                }
+
+
+                place.placeData[placeIndex].slotsData = newSlotsData;
+                await place.save();
+            }
+
+            res.status(200).json({ message: 'Updated Successfully' });
+        } catch (error) {
+            console.error('Server error:', error);
+            res.status(500).json({ message: 'Server error', error });
+        }
     }
 }
 module.exports = userCtrl
